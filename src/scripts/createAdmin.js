@@ -1,14 +1,22 @@
 import bcrypt from "bcrypt";
 import mongoose from "mongoose";
 import User from "../modules/auth/user.model.js";
+import dotenv from "dotenv";
 
-await mongoose.connect("mongodb+srv://ysaidheeraj1111_db_user:sLEbEl5yaBFIl9bT@cluster0.17sxltg.mongodb.net/");
+dotenv.config();
 
-const password = "Admin@123";
+await mongoose.connect(process.env.MONGO_URI);
+
+const password = process.env.ADMIN_PASSWORD;
+
+if (!password) {
+  throw new Error("ADMIN_PASSWORD not set");
+}
+
 const hash = await bcrypt.hash(password, 12);
 
 await User.create({
-  email: "admin@signalzero.gov",
+  email: process.env.ADMIN_EMAIL || "admin@signalzero.gov",
   password: hash,
   role: "ADMIN",
   status: "ACTIVE",
@@ -16,4 +24,4 @@ await User.create({
 });
 
 console.log("✅ Admin created successfully");
-process.exit();
+process.exit(0);

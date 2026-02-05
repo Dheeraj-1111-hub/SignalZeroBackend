@@ -1,14 +1,25 @@
 import bcrypt from "bcrypt";
 import mongoose from "mongoose";
 import User from "../modules/auth/user.model.js";
+import dotenv from "dotenv";
 
-await mongoose.connect("mongodb+srv://ysaidheeraj1111_db_user:sLEbEl5yaBFIl9bT@cluster0.17sxltg.mongodb.net/");
+dotenv.config();
 
-const password = "Operator@123";
+if (!process.env.MONGO_URI) {
+  throw new Error("MONGO_URI not set");
+}
+
+if (!process.env.OPERATOR_PASSWORD) {
+  throw new Error("OPERATOR_PASSWORD not set");
+}
+
+await mongoose.connect(process.env.MONGO_URI);
+
+const password = process.env.OPERATOR_PASSWORD;
 const hash = await bcrypt.hash(password, 12);
 
 await User.create({
-  email: "operator@signalzero.in",
+  email: process.env.OPERATOR_EMAIL || "operator@signalzero.in",
   password: hash,
   role: "OPERATOR",
   status: "ACTIVE",
@@ -16,4 +27,4 @@ await User.create({
 });
 
 console.log("✅ Operator created successfully");
-process.exit();
+process.exit(0);

@@ -9,10 +9,14 @@ router.get("/me", requireAuth, (req, res) => {
   const user = req.user;
 
   res.json({
-    id: user._id,
-    email: user.email,
-    role: user.role,
-  });
+  id: user._id,
+  email: user.email,
+  role: user.role,
+  name: user.name,
+  city: user.city,
+  status: user.status,
+});
+
 });
 router.post("/login", login);
 router.post("/register", register);

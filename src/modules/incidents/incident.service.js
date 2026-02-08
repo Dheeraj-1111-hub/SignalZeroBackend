@@ -49,6 +49,10 @@ export async function getIncidentById(req, res, next) {
    ===================================================== */
 export async function createIncident(req, res, next) {
   try {
+    if (!req.user?._id) {
+      return res.status(401).json({ error: "Unauthorized" });
+    }
+
     const parsed = createIncidentSchema.parse(req.body);
     telemetry.incidentCount++;
 
@@ -56,12 +60,11 @@ export async function createIncident(req, res, next) {
       ...parsed,
       confidence: 0,
       status: "OPEN",
-      createdBy: req.user._id,
+      createdBy: req.user._id, // 🔥 REQUIRED
       timeline: [
         {
           type: "reported",
           description: "Incident reported",
-          timestamp: new Date(),
         },
       ],
     });
@@ -71,16 +74,11 @@ export async function createIncident(req, res, next) {
       payload: parsed,
     });
 
-    /* 🔍 AUDIT */
     await logAudit({
       req,
       action: "INCIDENT_CREATED",
       entityType: "Incident",
       entityId: incident._id,
-      metadata: {
-        severity: incident.severity,
-        source: incident.source,
-      },
     });
 
     getIO().emit("incident:new", incident);

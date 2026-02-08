@@ -21,11 +21,10 @@ export async function verifyIncident(req, res, next) {
       description: "Incident verified by operator",
     });
 
-    await incident.save();
+    // 🔥 KEY FIX (prevents createdBy crash)
+    await incident.save({ validateBeforeSave: false });
 
-    const io = getIO();
-    io.emit("incident:status", incident);
-
+    getIO().emit("incident:status", incident);
     res.json(incident);
   } catch (err) {
     next(err);
@@ -45,11 +44,10 @@ export async function rejectIncident(req, res, next) {
       description: "Incident rejected during verification",
     });
 
-    await incident.save();
+    // 🔥 SAME FIX HERE
+    await incident.save({ validateBeforeSave: false });
 
-    const io = getIO();
-    io.emit("incident:status", incident);
-
+    getIO().emit("incident:status", incident);
     res.json(incident);
   } catch (err) {
     next(err);

@@ -8,8 +8,9 @@ import IORedis from "ioredis";
 export const redisConnection = {
   host: process.env.REDIS_HOST,
   port: Number(process.env.REDIS_PORT),
+  username: "default",              // ✅ REQUIRED for Upstash
   password: process.env.REDIS_PASSWORD,
-  tls: {}, // REQUIRED for Upstash
+  tls: {},                           // ✅ REQUIRED for Upstash
 };
 
 export const redis = new IORedis(redisConnection);

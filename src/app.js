@@ -20,12 +20,28 @@ import { latencyMiddleware } from "./middlewares/latency.middleware.js";
 
 const app = express();
 
+const allowedOrigins = [
+  process.env.CLIENT_URL,          // Vercel prod
+  "http://localhost:8080",          // local frontend
+  "http://localhost:5173",          // vite alt
+];
+
 app.use(
   cors({
-    origin: process.env.CLIENT_URL || "*",
+    origin: function (origin, callback) {
+      // allow server-to-server & tools like Postman
+      if (!origin) return callback(null, true);
+
+      if (allowedOrigins.includes(origin)) {
+        callback(null, true);
+      } else {
+        callback(new Error("Not allowed by CORS"));
+      }
+    },
     credentials: true,
   })
 );
+
 
 app.use(express.json());
 app.use(cookieParser());

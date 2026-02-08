@@ -1,3 +1,4 @@
+// src/workers/ai.worker.js
 import { Worker } from "bullmq";
 import Incident from "../modules/incidents/incident.model.js";
 import { calculateAIConfidence } from "../modules/ai/confidence.engine.js";
@@ -13,7 +14,6 @@ new Worker(
 
     try {
       const confidence = await calculateAIConfidence(payload);
-
       await Incident.findByIdAndUpdate(incidentId, { confidence });
 
       telemetry.ai.calls++;
@@ -36,4 +36,4 @@ new Worker(
   }
 );
 
-console.log("🧠 AI Worker running (redisConnection)");
+console.log("🧠 AI Worker running");

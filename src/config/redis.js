@@ -4,9 +4,12 @@ import IORedis from "ioredis";
  * 🔥 Single source of truth
  * Used by Queue + Worker
  */
+
 export const redisConnection = {
-  host: "127.0.0.1",
-  port: 6379,
+  host: process.env.REDIS_HOST,
+  port: Number(process.env.REDIS_PORT),
+  password: process.env.REDIS_PASSWORD,
+  tls: {}, // REQUIRED for Upstash
 };
 
 export const redis = new IORedis(redisConnection);

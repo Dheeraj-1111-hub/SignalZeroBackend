@@ -1,3 +1,4 @@
+// src/app.js
 import express from "express";
 import cors from "cors";
 import cookieParser from "cookie-parser";
@@ -19,11 +20,24 @@ import { latencyMiddleware } from "./middlewares/latency.middleware.js";
 
 const app = express();
 
-app.use(cors({ origin: "http://localhost:8080", credentials: true }));
+// ✅ CORS must come from env (NOT localhost)
+app.use(
+  cors({
+    origin: process.env.CLIENT_URL || "*",
+    credentials: true,
+  })
+);
+
 app.use(express.json());
 app.use(cookieParser());
 app.use(latencyMiddleware);
 
+// ✅ Health check (MANDATORY for Render)
+app.get("/api/health", (req, res) => {
+  res.json({ status: "ok" });
+});
+
+// ✅ Routes
 app.use("/api/auth", authRoutes);
 app.use("/api/incidents", incidentRoutes);
 app.use("/api/dispatch", dispatchRoutes);
@@ -32,10 +46,12 @@ app.use("/api/verification", verificationRoutes);
 app.use("/api/analytics", analyticsRoutes);
 app.use("/api/system", systemRoutes);
 app.use("/api/telemetry", telemetryRoutes);
-app.use("/api/responders", responderRoutes);
 app.use("/api/settings", settingsRoutes);
 app.use("/api/audit", auditRoutes);
 
+// ❌ Duplicate responders route REMOVED
+
+// ✅ Error handling (must be last)
 app.use(notFound);
 app.use(errorHandler);
 
